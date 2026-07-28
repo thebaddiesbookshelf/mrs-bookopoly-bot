@@ -9,6 +9,9 @@ const Player = require('./models/Player');
 const BookReward = require('./models/BookReward');
 const calculateBookReward = require('./utils/bookRewardCalculator');
 const startInvestigationResolver = require('./jobs/investigationResolver');
+const auctionButtons = require("./buttons/auctionButtons");
+const auctionBidModal = require("./modals/auctionBidModal");
+const startAuctionResolver = require("./jobs/auctionResolver");
 
 const {
   ActivityType,
@@ -68,6 +71,7 @@ client.once(Events.ClientReady, (readyClient) => {
   });
 
   startInvestigationResolver(readyClient);
+  startAuctionResolver(readyClient);
   console.log('🕵️ Investigation resolver started.');
 });
 
@@ -77,10 +81,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const customId = interaction.customId;
 
     if (customId.startsWith('trade_')) {
-      await tradeButtons(interaction);
-    } else {
-      await jailButtons(interaction);
-    }
+
+  await tradeButtons(interaction);
+
+} else if (customId.startsWith('auction_')) {
+
+  await auctionButtons(interaction);
+
+} else {
+
+  await jailButtons(interaction);
+
+}
   } catch (error) {
     console.error('Error handling button interaction:', error);
 
@@ -98,6 +110,45 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   return;
+}
+
+if (interaction.isModalSubmit()) {
+
+  try {
+
+    if (
+      interaction.customId.startsWith(
+        'auction_bid_submit:'
+      )
+    ) {
+
+      await auctionBidModal(interaction);
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      'Error handling modal interaction:',
+      error
+    );
+
+    const errorMessage = {
+      content:
+        'Mrs. Bookopoly misplaced that page in her ledger. Please try again!',
+      flags: MessageFlags.Ephemeral,
+    };
+
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp(errorMessage);
+    } else {
+      await interaction.reply(errorMessage);
+    }
+
+  }
+
+  return;
+
 }
 
   if (interaction.isAutocomplete()) {

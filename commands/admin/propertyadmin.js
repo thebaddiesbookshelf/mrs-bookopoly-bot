@@ -294,13 +294,25 @@ if (ownsFullSet) {
       })
       .setTimestamp();
 
-    await interaction.channel.send({
-      content: `<@${member.id}>`,
-      embeds: [propertyEmbed],
-      allowedMentions: {
-        users: [member.id],
-      },
+    const deedChannel =
+    interaction.guild.channels.cache.get(
+        "1499925370378653696"
+    );
+
+if (deedChannel) {
+
+    await deedChannel.send({
+
+        content: `<@${member.id}>`,
+
+        embeds: [propertyEmbed],
+
+        allowedMentions: {
+            users: [member.id],
+        },
+
     });
+}
 
     let confirmation =
       `✅ Awarded **${property.name}** to ${member}.\n` +
