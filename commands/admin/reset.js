@@ -1,6 +1,5 @@
 const {
   SlashCommandBuilder,
-  PermissionFlagsBits,
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
@@ -10,6 +9,7 @@ const {
 
 const Player = require('../../models/Player'); // Adjust this path if needed
 const BookReward = require('../../models/BookReward');
+const { isMayor } = require('../../utils/isMayor');
 
 const RESET_DATA = {
   balance: 0,
@@ -36,7 +36,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('reset')
     .setDescription('Reset Bookopoly player data.')
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 
     .addSubcommand((subcommand) =>
       subcommand
@@ -57,6 +56,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
+     if (!(await isMayor(interaction))) return;
     const subcommand = interaction.options.getSubcommand();
 
     if (subcommand === 'player') {

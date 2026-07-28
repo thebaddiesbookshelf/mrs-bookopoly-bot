@@ -1,6 +1,5 @@
 const {
   EmbedBuilder,
-  PermissionFlagsBits,
   SlashCommandBuilder,
 } = require('discord.js');
 
@@ -9,14 +8,12 @@ const {
   sendLockupAnnouncement,
 } = require('../../utils/lockupAnnouncements');
 const { removeLockupRole } = require('../../utils/lockupRole');
+const { isMayor } = require('../../utils/isMayor');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('release')
     .setDescription('Release a reader from Literary Lockup.')
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.Administrator
-    )
     .addUserOption((option) =>
       option
         .setName('member')
@@ -32,6 +29,8 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    if (!(await isMayor(interaction))) return;
+
     await interaction.deferReply({ ephemeral: true });
 
     const member = interaction.options.getUser(

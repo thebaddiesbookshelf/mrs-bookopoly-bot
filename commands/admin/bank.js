@@ -1,17 +1,16 @@
 const {
   EmbedBuilder,
-  PermissionFlagsBits,
   SlashCommandBuilder,
 } = require('discord.js');
 
 const Player = require('../../models/Player');
 const { getRandomQuote } = require('../../utils/quotes');
+const { isMayor } = require('../../utils/isMayor');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('bank')
     .setDescription('Manage a player’s Baddie Bucks.')
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 
     .addSubcommand((subcommand) =>
       subcommand
@@ -92,6 +91,8 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    if (!(await isMayor(interaction))) return;
+    
     await interaction.deferReply({
       ephemeral: true,
     });

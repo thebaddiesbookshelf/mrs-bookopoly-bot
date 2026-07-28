@@ -1,11 +1,11 @@
 const {
   SlashCommandBuilder,
-  PermissionFlagsBits,
   EmbedBuilder,
   MessageFlags,
 } = require('discord.js');
 
 const Player = require('../../models/Player');
+const { isMayor } = require('../../utils/isMayor');
 
 const {
   properties,
@@ -17,9 +17,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('propertyadmin')
     .setDescription('Manage Bookopoly player properties.')
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.ManageGuild
-    )
 
     .addSubcommand((subcommand) =>
       subcommand
@@ -126,6 +123,7 @@ module.exports = {
   },
 
   async execute(interaction) {
+      if (!(await isMayor(interaction))) return;
     const subcommand =
       interaction.options.getSubcommand();
 
