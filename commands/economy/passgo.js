@@ -198,7 +198,7 @@ module.exports = {
           }
         )
         .setFooter({
-          text: 'Come back every 6 hours to pass GO again!',
+          text: 'Come back every 4 hours to pass GO again!',
         });
 
       return interaction.reply({

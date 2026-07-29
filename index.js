@@ -12,6 +12,7 @@ const startInvestigationResolver = require('./jobs/investigationResolver');
 const auctionButtons = require("./buttons/auctionButtons");
 const auctionBidModal = require("./modals/auctionBidModal");
 const startAuctionResolver = require("./jobs/auctionResolver");
+const handleJailMessage = require("./events/jailMessageGuard");
 
 const {
   ActivityType,
@@ -26,6 +27,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.MessageContent,
   ],
 });
@@ -208,11 +210,25 @@ if (!command) {
 });
 
 const BOOK_LOG_CHANNEL_ID = '1499925482903306352';
+const JAIL_CHANNEL_ID = '1499925731155644478';
 
 client.on(Events.MessageCreate, async (message) => {
   try {
-    // Ignore bots and messages outside servers.
-    if (message.author.bot || !message.guild) {
+    // Ignore messages outside servers.
+    if (!message.guild) {
+      return;
+    }
+
+    // Silently enforce the Literary Lockup role restrictions.
+    await handleJailMessage(message);
+
+    // Nothing else in this listener needs to process jail messages.
+    if (message.channelId === JAIL_CHANNEL_ID) {
+      return;
+    }
+
+    // Ignore bot messages everywhere else.
+    if (message.author.bot) {
       return;
     }
 
