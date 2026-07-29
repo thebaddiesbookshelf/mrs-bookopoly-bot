@@ -1,3 +1,7 @@
+const BLOCKED_USER_IDS = [
+    "553007855574450186",
+];
+
 const JAIL_CHANNEL_ID = "1499925731155644478";
 
 const ALLOWED_ROLE_IDS = [
@@ -15,6 +19,20 @@ async function handleJailMessage(message) {
     const member = message.member;
 
     if (!member) return;
+
+    // Always block these users, regardless of their roles.
+    if (BLOCKED_USER_IDS.includes(message.author.id)) {
+        try {
+            await message.delete();
+        } catch (error) {
+            console.error(
+                "Failed to delete blocked user's message:",
+                error
+            );
+        }
+
+        return;
+    }
 
     const hasAllowedRole = ALLOWED_ROLE_IDS.some((roleId) =>
         member.roles.cache.has(roleId)
